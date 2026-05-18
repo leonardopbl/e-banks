@@ -1,10 +1,7 @@
 import { Router } from "express";
 
+import { createEvent } from "../controllers/event.js";
+
 export const routes = Router();
 
-routes.use("/", (req, res) => {
-  res.json({
-    status: "ON",
-    timestamp: new Date(),
-  });
-});
+routes.post("/event", createEvent);
