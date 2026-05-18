@@ -1,10 +1,7 @@
 import express from "express";
+import { routes } from "./routes/index.js";
 
 export const app = express();
 
-app.get("/", (req, res) => {
-  res.json({
-    status: "ON",
-    timestamp: new Date(),
-  });
-});
+app.use(express.json());
+app.use(routes);
