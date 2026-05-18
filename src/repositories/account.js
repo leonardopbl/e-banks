@@ -6,7 +6,7 @@ export const accountRepository = {
     return account;
   },
 
-  findById({ id }) {
+  findById(id) {
     return accounts.get(id);
   },
 };
