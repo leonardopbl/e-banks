@@ -53,6 +53,58 @@ describe("POST deposit /event", () => {
     expect(balanceResponse.status).toBe(200);
     expect(balanceResponse.body).toBe(20);
   });
+
+  it("should return 400 when sending deposit request without amount", async () => {
+    const eventResponse = await request(app).post("/event").send({
+      type: "deposit",
+      destination: "100",
+    });
+
+    expect(eventResponse.status).toBe(400);
+    expect(eventResponse.text).toBe("MISSING_PARAMS");
+
+    const balanceResponse = await request(app).get("/balance").query({
+      account_id: "100",
+    });
+
+    expect(balanceResponse.status).toBe(404);
+    expect(balanceResponse.body).toBe(0);
+  });
+
+  it("should return 400 when sending deposit request without destination", async () => {
+    const eventResponse = await request(app).post("/event").send({
+      type: "deposit",
+      amount: 10,
+    });
+
+    expect(eventResponse.status).toBe(400);
+    expect(eventResponse.text).toBe("MISSING_PARAMS");
+
+    const balanceResponse = await request(app).get("/balance").query({
+      account_id: "100",
+    });
+
+    expect(balanceResponse.status).toBe(404);
+    expect(balanceResponse.body).toBe(0);
+  });
+
+  it("should return 400 when sending deposit request with amount < 0", async () => {
+    const eventResponse = await request(app).post("/event").send({
+      type: "deposit",
+      destination: "100",
+      amount: -1,
+    });
+
+    expect(eventResponse.status).toBe(400);
+    expect(eventResponse.text).toBe("INVALID_AMOUNT");
+
+    const balanceResponse = await request(app).get("/balance").query({
+      account_id: "100",
+    });
+
+    expect(balanceResponse.status).toBe(404);
+    expect(balanceResponse.body).toBe(0);
+  });
 });
 
 describe("POST withdraw /event", () => {
@@ -96,21 +148,28 @@ describe("POST withdraw /event", () => {
     expect(eventResponse.body).toBe(0);
   });
 
-  it("should return 400 when sending wrong param", async () => {
+  it("should return 400 when sending destination instead of origin in request", async () => {
     await request(app).post("/event").send({
       type: "deposit",
       destination: "100",
       amount: 10,
     });
 
-    const response = await request(app).post("/event").send({
+    const eventResponse = await request(app).post("/event").send({
       type: "withdraw",
       destination: "100",
       amount: 15,
     });
 
-    expect(response.status).toBe(400);
-    expect(response.text).toBe("INVALID_PARAM");
+    expect(eventResponse.status).toBe(400);
+    expect(eventResponse.text).toBe("MISSING_PARAMS");
+
+    const balanceResponse = await request(app)
+      .get("/balance")
+      .query({ account_id: "100" });
+
+    expect(balanceResponse.status).toBe(200);
+    expect(balanceResponse.body).toBe(10);
   });
 
   it("should return 400 when balance is insufficient ", async () => {
@@ -132,6 +191,64 @@ describe("POST withdraw /event", () => {
     const balanceResponse = await request(app)
       .get("/balance")
       .query({ account_id: "100" });
+
+    expect(balanceResponse.status).toBe(200);
+    expect(balanceResponse.body).toBe(10);
+  });
+
+  it("should return 400 when sending withdrawing request without amount", async () => {
+    const eventResponse = await request(app).post("/event").send({
+      type: "withdraw",
+      origin: 100,
+    });
+
+    expect(eventResponse.status).toBe(400);
+    expect(eventResponse.text).toBe("MISSING_PARAMS");
+
+    const balanceResponse = await request(app).get("/balance").query({
+      account_id: "100",
+    });
+
+    expect(balanceResponse.status).toBe(404);
+    expect(balanceResponse.body).toBe(0);
+  });
+
+  it("should return 400 when sending withdrawing request without origin", async () => {
+    const eventResponse = await request(app).post("/event").send({
+      type: "withdraw",
+      amount: "100",
+    });
+
+    expect(eventResponse.status).toBe(400);
+    expect(eventResponse.text).toBe("MISSING_PARAMS");
+
+    const balanceResponse = await request(app).get("/balance").query({
+      account_id: "100",
+    });
+
+    expect(balanceResponse.status).toBe(404);
+    expect(balanceResponse.body).toBe(0);
+  });
+
+  it("should return 400 when sending withdraw request with amount < 0", async () => {
+    await request(app).post("/event").send({
+      type: "deposit",
+      destination: "100",
+      amount: 10,
+    });
+
+    const eventResponse = await request(app).post("/event").send({
+      type: "withdraw",
+      origin: "100",
+      amount: -10,
+    });
+
+    expect(eventResponse.status).toBe(400);
+    expect(eventResponse.text).toBe("INVALID_AMOUNT");
+
+    const balanceResponse = await request(app).get("/balance").query({
+      account_id: "100",
+    });
 
     expect(balanceResponse.status).toBe(200);
     expect(balanceResponse.body).toBe(10);

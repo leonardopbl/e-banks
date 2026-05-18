@@ -17,8 +17,16 @@ export function createEvent(req, res) {
       return res.status(404).send(0);
     }
 
-    if (error.message === "INVALID_PARAM") {
-      return res.status(400).send("INVALID_PARAM");
+    if (error.message === "INVALID_TYPE") {
+      return res.status(400).send("INVALID_TYPE_PARAM");
+    }
+
+    if (error.message === "INVALID_AMOUNT") {
+      return res.status(400).send("INVALID_AMOUNT");
+    }
+
+    if (error.message === "MISSING_PARAMS") {
+      return res.status(400).send("MISSING_PARAMS");
     }
 
     if (error.message === "INSUFFICIENT_FUNDS") {

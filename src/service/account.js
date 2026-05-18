@@ -1,6 +1,10 @@
 import { accountRepository } from "../repositories/account.js";
 
 export default function accountService({ type, origin, destination, amount }) {
+  if (!type) {
+    throw new Error("MISSING_PARAMS");
+  }
+
   switch (type) {
     case "get_balance":
       return getBalance({ id: destination });
@@ -8,6 +12,8 @@ export default function accountService({ type, origin, destination, amount }) {
       return deposit({ id: destination, amount });
     case "withdraw":
       return withdraw({ id: origin, amount });
+    default:
+      throw new Error("INVALID_TYPE");
   }
 
   function getBalance({ id }) {
@@ -21,8 +27,12 @@ export default function accountService({ type, origin, destination, amount }) {
   }
 
   function deposit({ id, amount }) {
-    if (!id) {
-      throw new Error("INVALID_PARAM");
+    if (!id || !amount) {
+      throw new Error("MISSING_PARAMS");
+    }
+
+    if (amount < 0) {
+      throw new Error("INVALID_AMOUNT");
     }
 
     const account = accountRepository.findById(id);
@@ -41,8 +51,12 @@ export default function accountService({ type, origin, destination, amount }) {
   }
 
   function withdraw({ id, amount }) {
-    if (!id) {
-      throw new Error("INVALID_PARAM");
+    if (!id || !amount) {
+      throw new Error("MISSING_PARAMS");
+    }
+
+    if (amount < 0) {
+      throw new Error("INVALID_AMOUNT");
     }
 
     const account = accountRepository.findById(id);
