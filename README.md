@@ -1,5 +1,16 @@
+## Requirements
+
+- NODE.js
+- pnpm
+
 ## HOW DO I START THE PROJECT?
 
-pn install / pnpm install
+```bash
+pn install
+OR
+pnpm install
 
-pn run dev / pnpm run dev
+pn run dev
+OR
+pnpm run dev
+```
