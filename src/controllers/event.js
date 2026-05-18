@@ -13,7 +13,19 @@ export function createEvent(req, res) {
 
     return res.status(201).json(result);
   } catch (error) {
-    return res.status(400).json({
+    if (error.message === "ACCOUNT_NOT_FOUND") {
+      return res.status(404).send(0);
+    }
+
+    if (error.message === "INVALID_PARAM") {
+      return res.status(400).send("INVALID_PARAM");
+    }
+
+    if (error.message === "INSUFFICIENT_FUNDS") {
+      return res.status(400).send("INSUFFICIENT_FUNDS");
+    }
+
+    return res.status(500).json({
       error: "Error during event process",
     });
   }

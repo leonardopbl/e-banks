@@ -15,7 +15,7 @@ export function getBalance(req, res) {
       return res.status(404).send(0);
     }
 
-    return res.status(400).json({
+    return res.status(500).json({
       error: "Error during get balance process",
     });
   }
