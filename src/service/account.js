@@ -2,13 +2,20 @@ import { accountRepository } from "../repositories/account.js";
 
 export default function accountService({ type, origin, destination, amount }) {
   switch (type) {
-    case "check_balance":
-      return checkBalance({ id: destination });
+    case "get_balance":
+      return getBalance({ id: destination });
     case "deposit":
       return deposit({ id: destination, amount });
   }
-  function checkBalance(id) {
-    return accountRepository.findById(id);
+
+  function getBalance({ id }) {
+    const account = accountRepository.findById(id);
+
+    if (!account) {
+      throw new Error("ACCOUNT_NOT_FOUND");
+    }
+
+    return account.balance;
   }
 
   function deposit({ id, amount }) {

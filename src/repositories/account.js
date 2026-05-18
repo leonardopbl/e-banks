@@ -9,4 +9,8 @@ export const accountRepository = {
   findById(id) {
     return accounts.get(id);
   },
+
+  clear() {
+    accounts.clear();
+  },
 };
