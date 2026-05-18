@@ -3,16 +3,16 @@ import { accountRepository } from "../repositories/account.js";
 export default function accountService({ type, origin, destination, amount }) {
   switch (type) {
     case "check_balance":
-      return checkBalance({ destination });
+      return checkBalance({ id: destination });
     case "deposit":
-      return deposit({ destination, amount });
+      return deposit({ id: destination, amount });
   }
-  function checkBalance({ destination }) {
-    return accountRepository.findById(destination);
+  function checkBalance(id) {
+    return accountRepository.findById(id);
   }
 
-  function deposit({ destination, amount }) {
-    const account = accountRepository.findById(destination);
+  function deposit({ id, amount }) {
+    const account = accountRepository.findById(id);
     if (!account) {
       const newAccount = {
         id: destination,
