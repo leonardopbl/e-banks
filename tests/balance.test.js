@@ -17,9 +17,7 @@ describe("GET /balance", () => {
     expect(response.status).toBe(200);
     expect(response.body).toBe(10);
   });
-});
 
-describe("GET /balance", () => {
   it("should return error from non existing account", async () => {
     const response = await request(app)
       .get("/balance")

@@ -26,10 +26,10 @@ export default function accountService({ type, origin, destination, amount }) {
         balance: amount,
       };
 
-      return accountRepository.save(newAccount);
+      return { destination: accountRepository.save(newAccount) };
     }
 
     account.balance += amount;
-    return accountRepository.save(account);
+    return { destination: accountRepository.save(account) };
   }
 }
