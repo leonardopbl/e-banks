@@ -5,6 +5,10 @@ export default function accountService({ type, origin, destination, amount }) {
     throw new Error("MISSING_PARAMS");
   }
 
+  if ((amount && typeof amount !== "number") || amount <= 0) {
+    throw new Error("INVALID_AMOUNT");
+  }
+
   switch (type) {
     case "get_balance":
       return getBalance({ id: destination });
@@ -12,6 +16,8 @@ export default function accountService({ type, origin, destination, amount }) {
       return deposit({ id: destination, amount });
     case "withdraw":
       return withdraw({ id: origin, amount });
+    case "transfer":
+      return transfer({ destination, origin, amount });
     default:
       throw new Error("INVALID_TYPE");
   }
@@ -29,10 +35,6 @@ export default function accountService({ type, origin, destination, amount }) {
   function deposit({ id, amount }) {
     if (!id || !amount) {
       throw new Error("MISSING_PARAMS");
-    }
-
-    if (amount < 0) {
-      throw new Error("INVALID_AMOUNT");
     }
 
     const account = accountRepository.findById(id);
@@ -55,10 +57,6 @@ export default function accountService({ type, origin, destination, amount }) {
       throw new Error("MISSING_PARAMS");
     }
 
-    if (amount < 0) {
-      throw new Error("INVALID_AMOUNT");
-    }
-
     const account = accountRepository.findById(id);
 
     if (!account) {
@@ -71,5 +69,26 @@ export default function accountService({ type, origin, destination, amount }) {
 
     account.balance -= amount;
     return { origin: accountRepository.save(account) };
+  }
+
+  function transfer({ destination, origin, amount }) {
+    if (!destination) {
+      throw new Error("MISSING_PARAMS");
+    }
+
+    if (destination === origin) {
+      throw new Error("INVALID_PARAMS");
+    }
+
+    const originAccount = accountRepository.findById(origin);
+
+    if (!originAccount) {
+      throw new Error("ACCOUNT_NOT_FOUND");
+    }
+
+    return {
+      ...withdraw({ id: originAccount.id, amount }),
+      ...deposit({ id: destination, amount }),
+    };
   }
 }
